@@ -11,20 +11,63 @@ const Chart = () => {
   const [AE4, setAE4] = useState(2.0);
   const [N4, setN4] = useState(0.17);
   const [AE1toAL1, setAE1toAL1] = useState([]);
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [editedSize, setEditedSize] = useState({ width: "", height: "" });
 
-  const sizes = [
-    [19, 22], [19, 23], [19, 24], [19, 25], [19, 27], [19, 28], [19, 29], [20, 28],
-    [20, 30], [20, 32], [20, 34], [20, 36], [21, 28], [21, 30], [21, 32], [21, 34],
-    [21, 36], [21, 38], [22, 28], [22, 29], [22, 30], [22, 32], [22, 34], [22, 36],
-    [22, 37], [23, 32], [23, 34], [23, 36], [23, 38], [24, 32], [24, 33], [24, 34],
-    [24, 37], [24, 38], [24, 42], [25, 35], [27, 34], [27, 36], [28, 40], [29, 37],
-    [29, 38], [30, 40], [32, 40], [32, 40.5], [32, 41], [32, 42], [34, 41.5], [34, 42]
-  ];
-  console.log (sizes[0][0]);
-  
+  const [sizes, setSizes] = useState([
+    [19, 22],
+    [19, 23],
+    [19, 24],
+    [19, 25],
+    [19, 27],
+    [19, 28],
+    [19, 29],
+    [20, 28],
+    [20, 30],
+    [20, 32],
+    [20, 34],
+    [20, 36],
+    [21, 28],
+    [21, 30],
+    [21, 32],
+    [21, 34],
+    [21, 36],
+    [21, 38],
+    [22, 28],
+    [22, 29],
+    [22, 30],
+    [22, 32],
+    [22, 34],
+    [22, 36],
+    [22, 37],
+    [23, 32],
+    [23, 34],
+    [23, 36],
+    [23, 38],
+    [24, 32],
+    [24, 33],
+    [24, 34],
+    [24, 37],
+    [24, 38],
+    [24, 42],
+    [25, 35],
+    [27, 34],
+    [27, 36],
+    [28, 40],
+    [29, 37],
+    [29, 38],
+    [30, 40],
+    [32, 40],
+    [32, 40.5],
+    [32, 41],
+    [32, 42],
+    [34, 41.5],
+    [34, 42],
+  ])
+
   const AE3toAL3 = [120, 115, 110, 100, 90, 80, 70, 140];
   const AE2toAL2 = AE3toAL3.map(() => C55 + 5);
-  const AN4 = 0.000032 * C60;
+  const AN4 = 0.0000032 * C60;
   const AE4toAL4 = [AE4, AE4, AE4, AE4 + 0.5, AE4 + 0.5, AE4 + 1, AE4 + 1, AE4];
   const N4toV4 = [
     N4,
@@ -96,11 +139,39 @@ const Chart = () => {
   const calculateRow = (index) => {
     const A5 = sizes[index][0];
     const B5 = sizes[index][1];
-    
+
     const AM5 = Number(C56);
-    const AN5 = (AN4 * A5 * B5) / 10;
-    const AO5 = AM5 + Number(AN5);
-    const N5 = N4 - 0.04;
+    const AN5 = AN4 * A5 * B5;
+    const AO5 = Math.round((AM5 + Number(AN5)) * 100) / 100;
+
+    let N5;
+    if (index === 0 || index === 1) {
+      N5 = N4 - 0.04;
+    } else if (index === 2 || index === 3) {
+      N5 = N4 - 0.05;
+    } else if (index === 4) {
+      N5 = N4 - 0.065;
+    } else if (
+      index === 5 ||
+      index === 6 ||
+      index === 7 ||
+      index === 8 ||
+      index === 12
+    ) {
+      N5 = N4 - 0.075;
+    } else if (
+      index === 9 ||
+      index === 10 ||
+      index === 13 ||
+      index === 14 ||
+      index === 18 ||
+      index === 19 ||
+      index === 20
+    ) {
+      N5 = N4 - 0.085;
+    } else {
+      N5 = N4 - 0.09;
+    }
 
     const AE5 = AE1toAL1[0] * A5 * B5;
     const AF5 = AE1toAL1[1] * A5 * B5;
@@ -111,7 +182,7 @@ const Chart = () => {
     const AK5 = AE1toAL1[6] * A5 * B5;
     const AL5 = AE1toAL1[7] * A5 * B5;
 
-    const O5 = (AE5 + AO5) * N4 - 1;
+    const O5 = (AE5 + AO5) * N5;
     const P5 = O5;
     const Q5 = P5;
     const R5 = Q5;
@@ -129,16 +200,36 @@ const Chart = () => {
     const AC5 = AK5 + AO5 + U5;
     const AD5 = AL5 + AO5 + V5;
 
-    const L5 = C57;
+    let L5 = C57;
 
-    const D5 = Math.ceil(W5, 0.5);
-    const E5 = Math.ceil(X5, 0.5);
-    const F5 = Math.ceil(Y5, 0.5);
-    const G5 = Math.ceil(Z5, 0.5);
-    const H5 = Math.ceil(AA5, 0.5);
-    const I5 = Math.ceil(AB5, 0.5);
-    const J5 = Math.ceil(AC5, 0.5);
-    const K5 = Math.ceil(AD5, 0.5);
+    if (
+      index === 11 ||
+      index === 16 ||
+      index === 23 ||
+      index === 24 ||
+      index === 27 ||
+      index === 28 ||
+      index === 32 ||
+      index === 33 ||
+      index === 34 ||
+      index === 35 ||
+      index > 36
+    ) {
+      L5 = C59;
+    }
+
+    const D5 = ceilToHalf(W5);
+    const E5 = ceilToHalf(X5);
+    const F5 = ceilToHalf(Y5);
+    const G5 = ceilToHalf(Z5);
+    const H5 = ceilToHalf(AA5);
+    const I5 = ceilToHalf(AB5);
+    const J5 = ceilToHalf(AC5);
+    const K5 = ceilToHalf(AD5);
+
+    function ceilToHalf(num) {
+      return Math.ceil(num * 2) / 2;
+    }
 
     return [
       A5,
@@ -184,12 +275,38 @@ const Chart = () => {
 
       AM5,
       AN5.toFixed(5),
-      AO5.toFixed(5),
+      AO5.toFixed(2),
     ];
   };
 
   const calculateRow1 = (AE3, AE2, AE4) => {
     return (AE3 / 1000 / 1550) * AE2 + (AE3 / 1000 / 1550) * AE2 * AE4;
+  };
+
+  const handleEdit = (index) => {
+    setEditingIndex(index);
+    setEditedSize({ width: sizes[index][0], height: sizes[index][1] });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditedSize((prevSize) => ({
+      ...prevSize,
+      [name]: value,
+    }));
+  };
+
+  const handleSave = (index) => {
+    const width = parseFloat(editedSize.width);
+    const height = parseFloat(editedSize.height);
+
+    if (!isNaN(width) && !isNaN(height)) {
+      const updatedSizes = sizes.map((size, i) =>
+        i === index ? [width, height] : size
+      );
+      setSizes(updatedSizes);
+      setEditingIndex(null);
+    }
   };
 
   const rows = () => {
@@ -199,7 +316,6 @@ const Chart = () => {
     }
     return calculatedRows;
   };
-  console.log(rows())
 
   return (
     <div className="p-5">
@@ -263,47 +379,115 @@ const Chart = () => {
           />
         </div>
       </div>
-
-      <table border="1">
-        <thead>
-          <tr>
-            <th colSpan={14}></th>
-            <th colSpan={8}>{O2 * 100 +   "%"}</th>
-            <th colSpan={8}></th>
-          </tr>
-          <tr>
-            <th colSpan={12}>Nonwoven Sheet Print</th>
-            <th colSpan={2}></th>
-            <th colSpan={8}>T/P</th>
-            <th colSpan={8}></th>
-            {AE3toAL3.map((value, idx) => (
-              <th key={idx}>{value}</th>
-            ))}
-            <th></th>
-            <th rowSpan={2}>
-              Ink <br /> {AN4}
-            </th>
-          </tr>
-          <tr>
-            {columnHeaders.map((col, idx) => (
-              <th colSpan={col.value === "Size" ? 2 : 1} key={idx}>
-                {col.value}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows().map((row, rowIndex) => (
-            <tr key={rowIndex} className={rowIndex % 2 === 0 ? "bg-gray-100" : "bg-white"}>
-              {row.map((cell, cellIndex) => (
-                <td key={cellIndex} className="border border-gray-300 px-2 py-1 text-sm">
-                  {cell}
+      <div className="flex">
+        <table>
+          <thead>
+            <tr>
+              <th className="h-[45px]" colSpan={3}></th>
+            </tr>
+            <tr>
+              <th colSpan={3}>Sizes</th>
+            </tr>
+            <tr>
+              <th colSpan={2}>Sizes</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sizes.map((size, index) => (
+              <tr key={index}>
+                <td>
+                  {editingIndex === index ? (
+                    <input
+                      type="number"
+                      name="width"
+                      value={editedSize.width}
+                      onChange={handleInputChange}
+                    />
+                  ) : (
+                    size[0]
+                  )}
                 </td>
+                <td>
+                  {editingIndex === index ? (
+                    <input
+                      type="number"
+                      name="height"
+                      value={editedSize.height}
+                      onChange={handleInputChange}
+                    />
+                  ) : (
+                    size[1]
+                  )}
+                </td>
+                <td>
+                  {editingIndex === index ? (
+                    <button
+                      onClick={() => handleSave(index)}
+                      className="bg-green-500 text-white"
+                    >
+                      Save
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleEdit(index)}
+                      className="bg-blue-500 text-white p-1"
+                    >
+                      Edit
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <table border="1">
+          <thead>
+            <tr>
+              <th colSpan={14}></th>
+              <th colSpan={8}>{O2 * 100 + "%"}</th>
+              <th colSpan={8}></th>
+            </tr>
+            <tr>
+              <th colSpan={12}>Nonwoven Sheet Print</th>
+              <th colSpan={2}></th>
+              <th colSpan={8}>T/P</th>
+              <th colSpan={8}></th>
+              {AE3toAL3.map((value, idx) => (
+                <th key={idx}>{value}</th>
+              ))}
+              <th></th>
+              <th rowSpan={2}>
+                Ink <br /> {AN4}
+              </th>
+            </tr>
+            <tr>
+              {columnHeaders.map((col, idx) => (
+                <th colSpan={col.value === "Size" ? 2 : 1} key={idx}>
+                  {col.value}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rows().map((row, rowIndex) => (
+              <tr
+                key={rowIndex}
+                className={rowIndex % 2 === 0 ? "bg-gray-100" : "bg-white"}
+              >
+                {row.map((cell, cellIndex) => (
+                  <td
+                    key={cellIndex}
+                    className="border border-gray-300 px-2 py-1 text-sm"
+                  >
+                    {cell}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
